@@ -4,7 +4,7 @@ import time
 # Test client for TCP connection to pico server
 
 # IP address of Pico TCP server
-server_ip = ""
+server_ip = "192.168.121.23"
 
 # open socket conenction to PICO W and repeatedly send a message
 while True:
@@ -17,4 +17,4 @@ while True:
     s.send(b"HELLO WORLD") 
     
     s.close()
-    time.sleep(0.2)
+    time.sleep(0.1)
