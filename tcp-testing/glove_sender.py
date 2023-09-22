@@ -116,13 +116,18 @@ while True:
     else:
         output+=" Stay X: {:.2f},".format(tilt_x)
     
-    # Send gyro output to server (robot)
-    output_enc = output.encode("utf-8") 
-    s.send(output_enc)
-    
-    # Get ultrasonic output from server (robot)
-    response = s.recv(1024)
-    ultra = response.decode("utf-8")
-    print(ultra)
+    try: 
+        # Send gyro output to server (robot)
+        output_enc = output.encode("utf-8") 
+        s.send(output_enc)
+        
+        # Get ultrasonic output from server (robot)
+        response = s.recv(1024)
+        ultra = response.decode("utf-8")
+        print(ultra)
+        
+    except OSError as e:
+        s.close()
+        print("connection closed")
          
     utime.sleep(0.2)

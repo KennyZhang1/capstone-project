@@ -57,27 +57,26 @@ else:
 
 # Open socket
 addr = socket.getaddrinfo('0.0.0.0', 80)[0][-1]
-
 s = socket.socket()
 s.bind(addr)
 s.listen(1)
 cl, addr = s.accept()
 print('CLIENT connected from: ', addr)
-
 print('listening on: ', addr)
 
 # Listen for connections
 while True:
     ultrasonic_data = ultra()
     try:
+        # receive gyro data
         request = cl.recv(1024)
         message = request.decode("utf-8")
         print(message)
         
+        # send ultrasonic data
         output_data = ultrasonic_data.encode("utf-8")
         cl.send(output_data)
         
-
     except OSError as e:
         cl.close()
         print('connection closed')
