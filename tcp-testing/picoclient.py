@@ -21,14 +21,19 @@ wlan.status() # 3 == success
 wlan.ifconfig()
 print(wlan.ifconfig())
 
-# Main loop. Open socket to server and send Hello world
+# Main loop. Open socket to server and send a blink command
 while True:
     ai = socket.getaddrinfo(server_ip, 80) 
     addr = ai[0][-1]
 
     s = socket.socket()
     s.connect(addr)
-    s.send(b"Hello from client!")
+    s.send(b"BLINK")
+    
+    # Recieve response from server
+    response = s.recv(1024)
+    res_dec = response.decode("UTF-8")
+    print(res_dec)
    
     s.close()          
-    time.sleep(0.1)    
+    time.sleep(0.5)    

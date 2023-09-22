@@ -1,11 +1,33 @@
+# imports
 import network
 import socket
 import time
 import random
 from machine import Pin
+import utime
 
-# declare pin variable
-p25 = Pin('LED',Pin.OUT)
+# helper functions
+def ultra():
+   trigger.low()
+   utime.sleep_us(2)
+   trigger.high()
+   utime.sleep_us(5)
+   trigger.low()
+   
+   while echo.value() == 0:
+       signaloff = utime.ticks_us()
+       
+   while echo.value() == 1:
+       signalon = utime.ticks_us()
+       
+   timepassed = signalon - signaloff
+   distance = (timepassed * 0.0343) / 2
+   ret_val = "The distance from object is "+str(distance)+" cm"
+   return ret_val
+
+# Pin definitions
+trigger = Pin(15, Pin.OUT)
+echo = Pin(14, Pin.IN)
 
 # WIFI credentials
 ssid = ""
@@ -39,26 +61,22 @@ addr = socket.getaddrinfo('0.0.0.0', 80)[0][-1]
 s = socket.socket()
 s.bind(addr)
 s.listen(1)
+cl, addr = s.accept()
+print('CLIENT connected from: ', addr)
 
 print('listening on: ', addr)
 
 # Listen for connections
 while True:
+    ultrasonic_data = ultra()
     try:
-        cl, addr = s.accept()
-        print('CLIENT connected from: ', addr)
         request = cl.recv(1024)
-        command = request.decode("utf-8")
-        print(command)
+        message = request.decode("utf-8")
+        print(message)
         
-        # recieve blink command
-        if (command == "BLINK"):
-            p25.on()
-            time.sleep(0.1)
-            p25.off()
-            time.sleep(0.1)
+        output_data = ultrasonic_data.encode("utf-8")
+        cl.send(output_data)
         
-        cl.close()
 
     except OSError as e:
         cl.close()
