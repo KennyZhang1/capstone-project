@@ -2,8 +2,8 @@
 from machine import Pin
 import utime
 
-trigger = Pin(3, Pin.OUT)
-echo = Pin(2, Pin.IN)
+trigger = Pin(15, Pin.OUT)
+echo = Pin(14, Pin.IN)
 
 def ultra():
    trigger.low()
@@ -24,4 +24,5 @@ def ultra():
    
 while True:
    ultra()
+   #print("The distance from object is cm")
    utime.sleep(1)
