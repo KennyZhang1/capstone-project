@@ -1,0 +1,11 @@
+FILE_TYPE = MULTI_PHYS_TABLE;
+
+PART 'LT1121CN8#PBF'
+CLASS = IC
+{========================================================================================}
+:"MANUFACTURER_NAME", "MANUFACTURER_PART_NUMBER"= "PART_NUMBER", "JEDEC_TYPE", "PACK_TYPE", "ARROW_PART_NUMBER", "ARROW_PRICE/STOCK", "DESCRIPTION", "DATASHEET", "HEIGHT";
+{========================================================================================}
+ "Analog Devices", "LT1121CN8#PBF" (!) = "", "DIP794W53P254L1016H394Q8N", "Dual-In-Line Packages", "LT1121CN8#PBF", "https://www.arrow.com/en/products/lt1121cn8pbf/analog-devices?region=europe", "Linear Technology LT1121CN8#PBF, LDO Voltage Regulator, Adjustable 150mA, 3.75  30 V, 8-Pin PDIP", "https://www.arrow.com/en/products/lt1121cn8pbf/analog-devices?region=europe", "3.937 mm"
+END_PART
+
+END.

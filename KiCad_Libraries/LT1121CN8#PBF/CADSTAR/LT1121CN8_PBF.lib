@@ -1,0 +1,16 @@
+.LT1121CN8_PBF :1 ;Linear Technology LT1121CN8#PBF, LDO Voltage Regulator, Adjustable 150mA, 3.75  30 V, 8-Pin PDIP
+DIP794W53P254L1016H394Q8N
+*STM IC
+*NGS
+*PLB 1="OUT" 2="ADJ" 3="GND" 4="NC_1" 5="'SHDN'" 6="NC_2" 7="NC_3" 8="IN"
+*MXP 8
+*DFN LT1121CN8_PBF
+~!Arrow Part Number (LT1121CN8#PBF)
+~!Link Arrow Price/Stock (https://www.arrow.com/en/products/lt1121cn8pbf/analog-devices?region=europe)
+~!Manufacturer_Name (Analog Devices)
+~!Manufacturer_Part_Number (LT1121CN8#PBF)
+~!Link Datasheet (https://www.arrow.com/en/products/lt1121cn8pbf/analog-devices?region=europe)
+~!Height (3.937mm)
+~!3D_Model (LT1121CN8#PBF)
+LT1121CN8_PBF
+1.1!U 2.1!U 3.1!U 4.1!U 8.1!U 7.1!U 6.1!U 5.1!U 
