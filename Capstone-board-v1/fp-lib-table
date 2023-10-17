@@ -2,5 +2,7 @@
   (version 7)
   (lib (name "Nima_custom_double")(type "KiCad")(uri "${KIPRJMOD}/Nima_custom_double.pretty")(options "")(descr ""))
   (lib (name "Nima_double1")(type "KiCad")(uri "${KIPRJMOD}/Nima_double1.pretty")(options "")(descr ""))
-  (lib (name "LinReg")(type "KiCad")(uri "C:/Users/Nima/Desktop/ECE 4991/capstone-project/KiCad_Libraries/LinReg")(options "")(descr ""))
+  (lib (name "LinReg")(type "KiCad")(uri "C:/Users/ruhul/OneDrive/Desktop/Capstone/capstone-project/KiCad_Libraries/LinReg")(options "")(descr ""))
+  (lib (name "TS")(type "KiCad")(uri "C:/Users/ruhul/OneDrive/Desktop/Capstone/capstone-project/KiCad_Libraries/TS02-66-60-BK-100-LCR-D")(options "")(descr ""))
+  (lib (name "GY")(type "KiCad")(uri "C:/Users/ruhul/OneDrive/Desktop/Capstone/capstone-project/KiCad_Libraries/GY-521")(options "")(descr ""))
 )
