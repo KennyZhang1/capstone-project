@@ -2747,8 +2747,8 @@
     )
     (pin "1" (uuid 40f8d015-0750-425a-b7ac-06be24a34eb2))
     (pin "2" (uuid ae621e4f-d45e-4e16-90a8-99be757b34fe))
-    (pin "3" (uuid 41206cd6-6fc0-4149-8e00-9304488ed32c))
-    (pin "3" (uuid 41206cd6-6fc0-4149-8e00-9304488ed32c))
+    (pin "3" (uuid 41206cd6-6fc0-4149-8e00-9304488ed32d))
+    (pin "3" (uuid 41206cd6-6fc0-4149-8e00-9304488ed32d))
     (instances
       (project "Capstone-board-v1"
         (path "/5a0b0107-0183-4094-a3d7-2a417dfae25a"
