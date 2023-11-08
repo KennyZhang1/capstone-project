@@ -18,8 +18,11 @@ HALL_RECEIVE_UUID = bluetooth.UUID(0x2C6E)
 ADV_APPEARANCE_GENERIC_BOARD = const(768)
 ADV_INTERVAL_MS = 250_000
 
+# timing constants
 duty_cycle = 65535
+delay_ms = 11
 
+# motor pin inits
 ENA = PWM(Pin(0))        
 IN1 = Pin(1, Pin.OUT)         
 IN2 = Pin(2, Pin.OUT)
@@ -36,6 +39,12 @@ trigger = Pin(TRIGGER_PIN, Pin.OUT)
 echo = Pin(ECHO_PIN, Pin.IN)
 led = machine.Pin('LED', machine.Pin.OUT)
 led.on()
+
+# Global queues/vars for disconnect handling
+gyro_queue = []
+curr_gyro = 0
+num_gcycles = 0
+#hall_queue = []
 
 # Function to perform ultrasonic distance measurement
 def measure_distance():
@@ -65,11 +74,11 @@ def measure_distance():
     # Calculate distance in centimeters
     distance = (time_passed * 0.0343) / 2
     
-    if(distance < 15):
+    if(distance < 30):
         return 0
-    elif(distance < 25):
+    elif(distance < 50):
         return 1
-    elif(distance < 35):
+    elif(distance < 70):
         return 2
     else:
         return 3
@@ -92,14 +101,14 @@ async def read_ultrasonic(ultra_characteristic):
             # Measure distance using the ultrasonic sensor
             distance = measure_distance()
             
-            print("US distance: ", distance)
+            #print("US distance: ", distance)
 
             # Update the ultra characteristic with the distance value
             ultra_characteristic.write(encode_int(distance))
         except Exception as e:
             print("Error in sensor_task:", e)
 
-        await asyncio.sleep_ms(1000)
+        await asyncio.sleep_ms(delay_ms)
 
 # Serially wait for connections and advertise
 async def advertise_board():
@@ -113,59 +122,155 @@ async def advertise_board():
             ) as connection:
                 print("Connection from", connection.device)
                 await connection.disconnected(timeout_ms=None)
+                print("Car Disconnected")
+                await disconnect_handler()
+                
         except Exception as e:
             print("Error in peripheral_task:", e)
-            
+
+# Function to read gyro number and spin motors
 async def recieve_gyro_data(gyro_receive_characteristic):
-    # Inside your central device code when you want to read data:
+    global curr_gyro
+    global num_gcycles
     while True:
         connection, data = await gyro_receive_characteristic.written()
         receivedNumber = decode_int(data)
-        print(receivedNumber)
+        print("Gyro number:", receivedNumber)
         if receivedNumber == 0: # Stop
             IN1.low()
             IN2.low()
             IN3.low()
             IN4.low()
-        elif receivedNumber == 1:# Forward
+        elif receivedNumber == 4:# Forward
             IN1.low()
             IN2.high()
             IN3.high()
             IN4.low()
-        elif receivedNumber == 2: # Backward
+        elif receivedNumber == 3: # Backward
             IN1.high()
             IN2.low()
             IN3.low()
             IN4.high()
-        elif receivedNumber == 3: # Right
-            IN3.low()
-            IN4.high()
+        elif receivedNumber == 2: # Right
             IN1.low()
             IN2.high()
-        elif receivedNumber == 4: # Left
+            IN3.low()
+            IN4.low()
+        elif receivedNumber == 1: # Left
+            IN1.low()
+            IN2.low()
             IN3.high()
             IN4.low()
-            IN1.high()
-            IN2.low()
-        await asyncio.sleep_ms(1000)
-        
+            
+        if receivedNumber == curr_gyro:
+            num_gcycles += 1
+        else:
+            if curr_gyro != 0:
+                if (len(gyro_queue) > 0 and curr_gyro == gyro_queue[len(gyro_queue)-1][0]):
+                    prev_tup = gyro_queue.pop()
+                    gyro_queue.append((curr_gyro, prev_tup[1] + num_gcycles))
+                else:
+                    gyro_queue.append((curr_gyro, num_gcycles))
+            curr_gyro = receivedNumber
+            num_gcycles = 1
+            
+        await asyncio.sleep_ms(delay_ms)
+
+# function to read hall number and trigger precision mode
 async def recieve_hall_data(hall_receive_characteristic, duty_cycle):
-    # Inside your central device code when you want to read data:
     while True:
         connection, data = await hall_receive_characteristic.written()
         receivedNumber = decode_hall_effect(data)
+        # precision mode
         if receivedNumber == 0:
-            duty_cycle=10000
+            duty_cycle=25000
             ENA.duty_u16(duty_cycle)
-            ENB.duty_u16(duty_cycle)
+            ENB.duty_u16(duty_cycle-3500)
+        # standard mode
         else:
             duty_cycle=65535
             ENA.duty_u16(duty_cycle)
-            ENB.duty_u16(duty_cycle)
+            ENB.duty_u16(duty_cycle-3500)
             
         print("Hall Number: ", receivedNumber)
-        print("Motor Duty Cycle: ", duty_cycle)
-        await asyncio.sleep_ms(1000)
+        #print("Motor Duty Cycle: ", duty_cycle)
+        #hall_queue.append(receivedNumber)
+        await asyncio.sleep_ms(delay_ms)
+
+# handler function for disconnect
+async def disconnect_handler():
+    print("Returning car to initial position")
+    duty_cycle=65535
+    g = len(gyro_queue)
+    '''
+    h = len(hall_queue)
+    # one extra gyro command. copy the most recent hall number to the empty spot
+    if (g > h):
+        print("interpolating hall number")
+        hall_queue.append(hall_queue[h-1])
+    # one extra hall number. discard it since it doesnt match a gyro command
+    elif (h > g):
+        print("discarding extra hall number")
+        unused = hall_queue.pop()
+    # queues match
+    else:
+        print("queue sizes match")
+    # at this point, queues match
+    '''
+    for i in range(g-1, -1, -1):
+        g_num = gyro_queue[i][0]
+        cycles = gyro_queue[i][1]
+        print("Found gyro number: " + str(g_num) + " for " + str(cycles) + " cycles")
+        #h_num = hall_queue[i]
+        for j in range(0, cycles):
+            '''
+            # set duty cycle depending on hall num
+            if h_num == 0:
+                duty_cycle=25000
+                ENA.duty_u16(duty_cycle)
+                ENB.duty_u16(duty_cycle-3500)
+            else:
+                duty_cycle=65535
+                ENA.duty_u16(duty_cycle)
+                ENB.duty_u16(duty_cycle-3500)
+            '''
+            
+            # do the reverse of the gyro num
+            # Case 4: go backwards
+            if g_num == 4:
+                IN1.high()
+                IN2.low()
+                IN3.low()
+                IN4.high()
+            # Case 3: go forwards
+            elif g_num == 3:
+                IN1.low()
+                IN2.high()
+                IN3.high()
+                IN4.low()
+            # Case 2: turn right back
+            elif g_num == 2:
+                IN1.high()
+                IN2.low()
+                IN3.low()
+                IN4.low()
+            # Case 1: turn left back
+            elif g_num == 1:
+                IN1.low()
+                IN2.low()
+                IN3.low()
+                IN4.high()
+                
+            utime.sleep_ms(delay_ms*17)
+            
+    # stop the car once complete and reset queues
+    IN1.low()
+    IN2.low()
+    IN3.low()
+    IN4.low()
+    print("Queue length: ", g)
+    gyro_queue.clear()
+    #hall_queue.clear()
 
 # Run both tasks
 async def main():
@@ -191,8 +296,13 @@ async def main():
         read_ultrasonic(ultra_characteristic),
         recieve_gyro_data(gyro_receive_characteristic),
         recieve_hall_data(hall_receive_characteristic, duty_cycle),
-        advertise_board(),
+        advertise_board()
     )
+    
 
 # Start the main event loop
 asyncio.run(main())
+
+
+
+
