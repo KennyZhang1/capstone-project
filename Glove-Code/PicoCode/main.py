@@ -1,7 +1,3 @@
-import sys
-
-sys.path.append("")
-
 from micropython import const
 
 import uasyncio as asyncio
@@ -17,14 +13,13 @@ pwm = PWM(Pin(13))
 pwm.freq(8)
 led = machine.Pin('LED', machine.Pin.OUT)
 led.on()
-hall_effect = Pin(14,Pin.IN)
+hall_effect = Pin(15,Pin.IN)
 #p0 = Pin(13, Pin.OUT)
 #buz= machine.Pin('buz', machine.Pin.OUT)
 
 # pwm.duty_u16(10000)
 # pwm.duty_u16(30000)
 # pwm.duty_u16(65535)
-
 
 
 # org.bluetooth.service.environmental_sensing
@@ -78,13 +73,13 @@ async def get_gyro():
     data_gyro1 = package_data(ax, ay, az)
 
     tilt_x1, tilt_y1, tilt_z1 = calculate_tilt_angles(data_gyro1['accel'])
-    if tilt_y1 > 40:
+    if tilt_y1 > 60:
         counter = 4
-    elif tilt_y1 < -40:
+    elif tilt_y1 < -50:
         counter = 3
-    elif tilt_x1 < -30:
+    elif tilt_x1 < -50:
         counter = 2
-    elif tilt_x1 > 30:
+    elif tilt_x1 > 60:
         counter = 1
     else:
         counter = 0
@@ -96,10 +91,6 @@ async def find_robot_pico():
     # maximise detection rate).
     async with aioble.scan(5000, interval_us=30000, window_us=30000, active=True) as scanner:
         async for result in scanner:
-            if result.name()!= None:
-                print("SCAN RESULT: ", result.name())
-                for id in result.services():
-                    print("\t UUIDs: ", id)
             # See if it matches our name and the environmental sensing service.
             if result.name() == "mpy-board" and _ENV_SENSE_UUID in result.services():
                 return result.device
@@ -110,7 +101,6 @@ async def main():
     if not device:
         print("Robot board not found")
         return
-
     try:
         print("Connecting to", device)
         connection = await device.connect()
@@ -151,7 +141,7 @@ async def main():
                         #p0.value(1)
                         pwm.duty_u16(10000)
                         #time.sleep(0.01)
-                    else:
+                    else: 
                         print("yes")
                         
                         pwm.duty_u16(0)
@@ -166,6 +156,6 @@ async def main():
             hall_value = hall_effect.value()
             await hall_effect_characteristic.write(_encode_hall_effect(hall_value))
             
-            await asyncio.sleep_ms(1000)
+            await asyncio.sleep_ms(11)
 
-asyncio.run(main())
+asyncio.run(main()) 
