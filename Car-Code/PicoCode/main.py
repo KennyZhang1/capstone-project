@@ -24,7 +24,11 @@ duty_cycle = 65535
 delay_ms = 11
 
 # motor pin inits
+<<<<<<< HEAD
 ENA = PWM(Pin(0))
+=======
+ENA = PWM(Pin(0))        
+>>>>>>> 62a6a3df10e039f37d54c1fc9bf63431b4950994
 IN1 = Pin(1, Pin.OUT)         
 IN2 = Pin(2, Pin.OUT)
 IN3 = Pin(3, Pin.OUT)
@@ -133,6 +137,7 @@ async def advertise_board():
                 print("Connection from", connection.device)
                 await connection.disconnected(timeout_ms=None)
                 print("Car Disconnected")
+<<<<<<< HEAD
 #                 await disconnect_handler()
                 
         except Exception as e:
@@ -442,6 +447,156 @@ async def recieve_gyro_data(gyro_receive_characteristic, hall_receive_characteri
 #     print("Queue length: ", g)
 #     gyro_queue.clear()
 #     #hall_queue.clear()
+=======
+                await disconnect_handler()
+                
+        except Exception as e:
+            print("Error in peripheral_task:", e)
+
+# Function to read gyro number and spin motors
+async def recieve_gyro_data(gyro_receive_characteristic):
+    global curr_gyro
+    global num_gcycles
+    while True:
+        connection, data = await gyro_receive_characteristic.written()
+        receivedNumber = decode_int(data)
+        print("Gyro number:", receivedNumber)
+        if receivedNumber == 0: # Stop
+            IN1.low()
+            IN2.low()
+            IN3.low()
+            IN4.low()
+        elif receivedNumber == 4:# Forward
+            IN1.low()
+            IN2.high()
+            IN3.high()
+            IN4.low()
+        elif receivedNumber == 3: # Backward
+            IN1.high()
+            IN2.low()
+            IN3.low()
+            IN4.high()
+        elif receivedNumber == 2: # Right
+            IN1.low()
+            IN2.high()
+            IN3.low()
+            IN4.low()
+        elif receivedNumber == 1: # Left
+            IN1.low()
+            IN2.low()
+            IN3.high()
+            IN4.low()
+            
+        if receivedNumber == curr_gyro:
+            num_gcycles += 1
+        else:
+            if curr_gyro != 0:
+                if (len(gyro_queue) > 0 and curr_gyro == gyro_queue[len(gyro_queue)-1][0]):
+                    prev_tup = gyro_queue.pop()
+                    gyro_queue.append((curr_gyro, prev_tup[1] + num_gcycles))
+                else:
+                    gyro_queue.append((curr_gyro, num_gcycles))
+            curr_gyro = receivedNumber
+            num_gcycles = 1
+            
+        await asyncio.sleep_ms(delay_ms)
+
+# function to read hall number and trigger precision mode
+async def recieve_hall_data(hall_receive_characteristic, duty_cycle):
+    while True:
+        connection, data = await hall_receive_characteristic.written()
+        receivedNumber = decode_hall_effect(data)
+        # precision mode
+        if receivedNumber == 0:
+            duty_cycle=25000
+            ENA.duty_u16(duty_cycle)
+            ENB.duty_u16(duty_cycle-3500)
+        # standard mode
+        else:
+            duty_cycle=65535
+            ENA.duty_u16(duty_cycle)
+            ENB.duty_u16(duty_cycle-3500)
+            
+        print("Hall Number: ", receivedNumber)
+        #print("Motor Duty Cycle: ", duty_cycle)
+        #hall_queue.append(receivedNumber)
+        await asyncio.sleep_ms(delay_ms)
+
+# handler function for disconnect
+async def disconnect_handler():
+    print("Returning car to initial position")
+    duty_cycle=65535
+    g = len(gyro_queue)
+    '''
+    h = len(hall_queue)
+    # one extra gyro command. copy the most recent hall number to the empty spot
+    if (g > h):
+        print("interpolating hall number")
+        hall_queue.append(hall_queue[h-1])
+    # one extra hall number. discard it since it doesnt match a gyro command
+    elif (h > g):
+        print("discarding extra hall number")
+        unused = hall_queue.pop()
+    # queues match
+    else:
+        print("queue sizes match")
+    # at this point, queues match
+    '''
+    for i in range(g-1, -1, -1):
+        g_num = gyro_queue[i][0]
+        cycles = gyro_queue[i][1]
+        print("Found gyro number: " + str(g_num) + " for " + str(cycles) + " cycles")
+        #h_num = hall_queue[i]
+        for j in range(0, cycles):
+            '''
+            # set duty cycle depending on hall num
+            if h_num == 0:
+                duty_cycle=25000
+                ENA.duty_u16(duty_cycle)
+                ENB.duty_u16(duty_cycle-3500)
+            else:
+                duty_cycle=65535
+                ENA.duty_u16(duty_cycle)
+                ENB.duty_u16(duty_cycle-3500)
+            '''
+            
+            # do the reverse of the gyro num
+            # Case 4: go backwards
+            if g_num == 4:
+                IN1.high()
+                IN2.low()
+                IN3.low()
+                IN4.high()
+            # Case 3: go forwards
+            elif g_num == 3:
+                IN1.low()
+                IN2.high()
+                IN3.high()
+                IN4.low()
+            # Case 2: turn right back
+            elif g_num == 2:
+                IN1.high()
+                IN2.low()
+                IN3.low()
+                IN4.low()
+            # Case 1: turn left back
+            elif g_num == 1:
+                IN1.low()
+                IN2.low()
+                IN3.low()
+                IN4.high()
+                
+            utime.sleep_ms(delay_ms*17)
+            
+    # stop the car once complete and reset queues
+    IN1.low()
+    IN2.low()
+    IN3.low()
+    IN4.low()
+    print("Queue length: ", g)
+    gyro_queue.clear()
+    #hall_queue.clear()
+>>>>>>> 62a6a3df10e039f37d54c1fc9bf63431b4950994
 
 # Run both tasks
 async def main():
@@ -465,7 +620,12 @@ async def main():
     # Start the sensor send/recieve tasks
     await asyncio.gather(
         read_ultrasonic(ultra_characteristic),
+<<<<<<< HEAD
         recieve_gyro_data(gyro_receive_characteristic, hall_receive_characteristic),
+=======
+        recieve_gyro_data(gyro_receive_characteristic),
+        recieve_hall_data(hall_receive_characteristic, duty_cycle),
+>>>>>>> 62a6a3df10e039f37d54c1fc9bf63431b4950994
         advertise_board()
     )
     
@@ -476,8 +636,11 @@ asyncio.run(main())
 
 
 
+<<<<<<< HEAD
 
 
 
 
 
+=======
+>>>>>>> 62a6a3df10e039f37d54c1fc9bf63431b4950994
