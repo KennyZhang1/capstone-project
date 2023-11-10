@@ -66,21 +66,7 @@ async def get_gyro():
 
     data_gyro = package_data(ax, ay, az)
 
-<<<<<<< HEAD
     tilt_x, tilt_y = calculate_tilt_angles(data_gyro['accel'])
-=======
-    tilt_x1, tilt_y1, tilt_z1 = calculate_tilt_angles(data_gyro1['accel'])
-    if tilt_y1 > 60:
-        counter = 4
-    elif tilt_y1 < -50:
-        counter = 3
-    elif tilt_x1 < -50:
-        counter = 2
-    elif tilt_x1 > 60:
-        counter = 1
-    else:
-        counter = 0
->>>>>>> 62a6a3df10e039f37d54c1fc9bf63431b4950994
     
     y_power = 0
     x_power = 0
@@ -170,10 +156,6 @@ async def main():
                     elif dist_ultra == 2:
                         print("no")
                         pwm.duty_u16(10000)
-<<<<<<< HEAD
-=======
-                        #time.sleep(0.01)
->>>>>>> 62a6a3df10e039f37d54c1fc9bf63431b4950994
                     else: 
                         print("yes")
                         
