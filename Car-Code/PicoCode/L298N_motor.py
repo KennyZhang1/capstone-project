@@ -25,14 +25,14 @@ SOFTWARE.
 """
 
 import time
-from machine import Pin
+from machine import PWM, Pin
 
 class L298N:
-    def __init__(self, ENA, IN1, IN2):
-        self.IN1 = IN1
-        self.IN2 = IN2
-        self.pwm = ENA
-        self.speed = 40000
+    def __init__(self, ENA, IN1, IN2):        
+        self.IN1 = Pin(IN1, Pin.OUT)
+        self.IN2 = Pin(IN2, Pin.OUT)
+        self.pwm = PWM(Pin(ENA))
+        self.speed = 0
         self.ismoving = False
         self.direction = 'STOP'
         self.time = 0
@@ -56,7 +56,7 @@ class L298N:
         self.Direction = 'STOP'
         
     def setSpeed(self, speed):
-        self.pwm.freq(15000)
+        self.pwm.freq(150)
         self.speed = speed
         self.pwm.duty_u16(speed)
         
@@ -113,4 +113,6 @@ class L298N:
             print('False')
         else:
             pass
+
+
 
