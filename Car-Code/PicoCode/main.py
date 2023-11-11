@@ -41,19 +41,6 @@ ADV_INTERVAL_MS = 250_000
 duty_cycle = 65535
 delay_ms = 11
 
-# motor pin inits
-# ENA = PWM(Pin(0))
-# IN1 = Pin(1, Pin.OUT)         
-# IN2 = Pin(2, Pin.OUT)
-# IN3 = Pin(3, Pin.OUT)
-# IN4 = Pin(4, Pin.OUT)
-# ENB = PWM(Pin(5))
-# ENC = PWM(Pin(28))
-# IN5 = Pin(27, Pin.OUT)         
-# IN6 = Pin(26, Pin.OUT)
-# IN7 = Pin(22, Pin.OUT)
-# IN8 = Pin(21, Pin.OUT)
-# END = PWM(Pin(20))
 
 back_right = L298N(BACK_RIGHT_EN, BACK_RIGHT_IN1, BACK_RIGHT_IN2)
 back_left = L298N(BACK_LEFT_EN, BACK_LEFT_IN1, BACK_LEFT_IN2)
@@ -193,26 +180,6 @@ def motor_scaling_x_spin(power):
     
     return dc
     
-#     output_perc = 0
-#     if input_perc < 15:
-#         output_perc = 0
-#         print("Output Perc: ", output_perc)
-#     elif input_perc < 30:
-#         output_perc = (0.5*input_perc)+22.5
-#     elif input_perc < 65:
-#         input_perc = input_perc-30
-#         input_squared = input_perc**2
-#         input_scaled = input_squared * 0.015
-#         input_shifted = input_scaled + 37.5
-#         output_perc = input_shifted
-#     else:
-#         output_perc = input_perc-10
-#         
-#     print("Output Perc: ", output_perc)
-#     
-#     return output_perc
-    
-
 # Function to read gyro number and spin motors
 async def recieve_gyro_data(gyro_receive_characteristic, hall_receive_characteristic):
     global curr_gyro
@@ -229,286 +196,115 @@ async def recieve_gyro_data(gyro_receive_characteristic, hall_receive_characteri
         y_power = data_tuple[0]
         x_power = data_tuple[1]
         y_dir = data_tuple[2]
-        x_dir = data_tuple[3]            
+        x_dir = data_tuple[3]
         
-#         duty_cycle_damper = motor_scaling(abs(receivedNumber)) / 100
-#         max_duty_cycle = 65535
-#         
-#         current_duty_cycle = int(max_duty_cycle * duty_cycle_damper)
+        print("YPerc: ", y_power/85, "XPerc: ", x_power/85,"YDir: ", y_dir, "XDir: ", x_dir)
+        
+        y = min(y_power/85, 1)
+        x = min(x_power/85, 1)
+        
+        y_calc = y*y_dir
+        x_calc = x*x_dir
 
-        if y_power >= x_power:
-            motion = "Y"
-        else:
-            motion = "X"
-            
-  
-        if motion == "Y":
-            if y_dir > 0: # forward
-                back_right.forward()
-                back_left.forward()
-                front_right.forward()
-                front_left.forward()
-                
-                print("moving forward")
-                
-            elif y_dir < 0: # backward
-                back_right.backward()
-                back_left.backward()
-                front_right.backward()
-                front_left.backward()
-                
-                print("moving backward")
-                
-            current_duty_cycle = motor_scaling_y(y_power)
-            
-            back_right.setSpeed(current_duty_cycle)
-            back_left.setSpeed(current_duty_cycle)
-            front_right.setSpeed(current_duty_cycle)
-            front_left.setSpeed(current_duty_cycle)
-            
-        if motion == "X" and orientation_lock == 1:
-            if x_dir > 0: # right strafe
-                front_left.forward()
-                front_right.backward()
-                back_left.backward()
-                back_right.forward()
-                
-                print("strafe right")
-                
-            elif x_dir < 0: # left strafe
-                front_left.backward()
-                front_right.forward()
-                back_left.forward()
-                back_right.backward()
-                
-                print("strafe left")
-            
-            current_duty_cycle = motor_scaling_x_spin(x_power)
-            back_right.setSpeed(current_duty_cycle)
-            back_left.setSpeed(current_duty_cycle)
-            front_right.setSpeed(current_duty_cycle)
-            front_left.setSpeed(current_duty_cycle)
-            
-        if motion == "X" and orientation_lock == 0:
-            if x_dir > 0: # right spinturn
-                front_left.forward()
-                front_right.backward()
-                back_left.forward()
-                back_right.backward()
-                
-                print("right spinturn")
-                
-            elif x_dir < 0: # left spinturn
-                front_left.backward()
-                front_right.forward()
-                back_left.backward()
-                back_right.forward()
-                
-                print("left spinturn")
-            
-            current_duty_cycle = motor_scaling_x_spin(x_power)
-            back_right.setSpeed(current_duty_cycle)
-            back_left.setSpeed(current_duty_cycle)
-            front_right.setSpeed(current_duty_cycle)
-            front_left.setSpeed(current_duty_cycle)
-            
+        denominator = max(y + x, 1);
+        
+        frontLeftPower = (y_calc + x_calc) / denominator;
+        backLeftPower = (y_calc - x_calc) / denominator;
+        frontRightPower = (y_calc - x_calc) / denominator;
+        backRightPower = (y_calc + x_calc) / denominator;
+        
+        back_right.setSpeedPercAndDir(backRightPower)
+        back_left.setSpeedPercAndDir(backLeftPower)
+        front_right.setSpeedPercAndDir(frontRightPower)
+        front_left.setSpeedPercAndDir(frontLeftPower)
 
-            
-                
+
+# 
+# 
+#         if y_power >= x_power:
+#             motion = "Y"
+#         else:
+#             motion = "X"
+#             
+#   
+#         if motion == "Y":
+#             if y_dir > 0: # forward
+#                 back_right.forward()
+#                 back_left.forward()
+#                 front_right.forward()
+#                 front_left.forward()
+#                 
+#                 print("moving forward")
+#                 
+#             elif y_dir < 0: # backward
+#                 back_right.backward()
+#                 back_left.backward()
+#                 front_right.backward()
+#                 front_left.backward()
+#                 
+#                 print("moving backward")
+#                 
+#             current_duty_cycle = motor_scaling_y(y_power)
+#             
+#             back_right.setSpeed(current_duty_cycle)
+#             back_left.setSpeed(current_duty_cycle)
+#             front_right.setSpeed(current_duty_cycle)
+#             front_left.setSpeed(current_duty_cycle)
+#             
 #         if motion == "X" and orientation_lock == 1:
 #             if x_dir > 0: # right strafe
-#                 IN1.high()
-#                 IN2.low()
-#                 IN3.low()
-#                 IN4.high()
-#                 IN5.low()
-#                 IN6.high()
-#                 IN7.high()
-#                 IN8.low()
-#             elif x_dir < 0: # left strafe
-#                 IN1.low()
-#                 IN2.high()
-#                 IN3.high()
-#                 IN4.low()
-#                 IN5.high()
-#                 IN6.low()
-#                 IN7.low()
-#                 IN8.high()
-#             current_duty_cycle = motor_scaling_x_strafe(x_power)
+#                 front_left.forward()
+#                 front_right.backward()
+#                 back_left.backward()
+#                 back_right.forward()
 #                 
-#         if motion == "X" and orientation_lock == 0:
-#             if x_dir > 0: # right spinturn
-#                 IN1.low()
-#                 IN2.high()
-#                 IN3.high()
-#                 IN4.low()
-#                 IN5.low()
-#                 IN6.high()
-#                 IN7.high()
-#                 IN8.low()
-# 
-#                 print("spinturn right")
-#             elif x_dir < 0: # left spinturn
-#                 IN1.high()
-#                 IN2.low()
-#                 IN3.low()
-#                 IN4.high()
-#                 IN5.high()
-#                 IN6.low()
-#                 IN7.low()
-#                 IN8.high()
-#                 print("spinturn left")
+#                 print("strafe right")
+#                 
+#             elif x_dir < 0: # left strafe
+#                 front_left.backward()
+#                 front_right.forward()
+#                 back_left.forward()
+#                 back_right.backward()
+#                 
+#                 print("strafe left")
 #             
 #             current_duty_cycle = motor_scaling_x_spin(x_power)
+#             back_right.setSpeed(current_duty_cycle)
+#             back_left.setSpeed(current_duty_cycle)
+#             front_right.setSpeed(current_duty_cycle)
+#             front_left.setSpeed(current_duty_cycle)
 #             
-#         ENA.duty_u16(current_duty_cycle)
-#         ENB.duty_u16(current_duty_cycle)
-#         ENC.duty_u16(current_duty_cycle)
-#         END.duty_u16(current_duty_cycle)
+#         if motion == "X" and orientation_lock == 0:
+#             if x_dir > 0: # right spinturn
+#                 front_left.forward()
+#                 front_right.backward()
+#                 back_left.forward()
+#                 back_right.backward()
+#                 
+#                 print("right spinturn")
+#                 
+#             elif x_dir < 0: # left spinturn
+#                 front_left.backward()
+#                 front_right.forward()
+#                 back_left.backward()
+#                 back_right.forward()
+#                 
+#                 print("left spinturn")
+#             
+#             current_duty_cycle = motor_scaling_x_spin(x_power)
+#             back_right.setSpeed(current_duty_cycle)
+#             back_left.setSpeed(current_duty_cycle)
+#             front_right.setSpeed(current_duty_cycle)
+#             front_left.setSpeed(current_duty_cycle)
+#             
+
+            
         
         print("O-lock: ", orientation_lock)
             
-#         if receivedNumber == 0: # Stop
-#             IN1.low()
-#             IN2.low()
-#             IN3.low()
-#             IN4.low()
-#         elif receivedNumber == 4:# Forward
-#             IN1.low()
-#             IN2.high()
-#             IN3.high()
-#             IN4.low()
-#         elif receivedNumber == 3: # Backward
-#             IN1.high()
-#             IN2.low()
-#             IN3.low()
-#             IN4.high()
-#         elif receivedNumber == 2: # Right
-#             IN1.low()
-#             IN2.high()
-#             IN3.low()
-#             IN4.low()
-#         elif receivedNumber == 1: # Left
-#             IN1.low()
-#             IN2.low()
-#             IN3.high()
-#             IN4.low()
-            
-#         if receivedNumber == curr_gyro:
-#             num_gcycles += 1
-#         else:
-#             if curr_gyro != 0:
-#                 if (len(gyro_queue) > 0 and curr_gyro == gyro_queue[len(gyro_queue)-1][0]):
-#                     prev_tup = gyro_queue.pop()
-#                     gyro_queue.append((curr_gyro, prev_tup[1] + num_gcycles))
-#                 else:
-#                     gyro_queue.append((curr_gyro, num_gcycles))
-#             curr_gyro = receivedNumber
-#             num_gcycles = 1
             
         await asyncio.sleep_ms(delay_ms)
 
-# function to read hall number and trigger precision mode
-# async def recieve_hall_data(hall_receive_characteristic):
-#     while True:
-#         connection, data = await hall_receive_characteristic.written()
-#         hall_value = decode_hall_effect(data)
-#         orientation_lock = False
-#         # precision mode
-#         if hall_value == 0:
-#             orientation_lock = True
-# #             ENA.duty_u16(duty_cycle)
-# #             ENB.duty_u16(duty_cycle-3500)
-#         # standard mode
-#         else:
-#             orientation_lock = False
-# #             ENA.duty_u16(duty_cycle)
-# #             ENB.duty_u16(duty_cycle-3500)
-#             
-# #         print("Hall Number: ", receivedNumber)
-#         #print("Motor Duty Cycle: ", duty_cycle)
-#         #hall_queue.append(receivedNumber)
-#         return orientation_lock
-#         await asyncio.sleep_ms(delay_ms)
-
-# handler function for disconnect
-# async def disconnect_handler():
-#     print("Returning car to initial position")
-#     duty_cycle=65535
-#     g = len(gyro_queue)
-#     '''
-#     h = len(hall_queue)
-#     # one extra gyro command. copy the most recent hall number to the empty spot
-#     if (g > h):
-#         print("interpolating hall number")
-#         hall_queue.append(hall_queue[h-1])
-#     # one extra hall number. discard it since it doesnt match a gyro command
-#     elif (h > g):
-#         print("discarding extra hall number")
-#         unused = hall_queue.pop()
-#     # queues match
-#     else:
-#         print("queue sizes match")
-#     # at this point, queues match
-#     '''
-#     for i in range(g-1, -1, -1):
-#         g_num = gyro_queue[i][0]
-#         cycles = gyro_queue[i][1]
-#         print("Found gyro number: " + str(g_num) + " for " + str(cycles) + " cycles")
-#         #h_num = hall_queue[i]
-#         for j in range(0, cycles):
-#             '''
-#             # set duty cycle depending on hall num
-#             if h_num == 0:
-#                 duty_cycle=25000
-#                 ENA.duty_u16(duty_cycle)
-#                 ENB.duty_u16(duty_cycle-3500)
-#             else:
-#                 duty_cycle=65535
-#                 ENA.duty_u16(duty_cycle)
-#                 ENB.duty_u16(duty_cycle-3500)
-#             '''
-#             
-#             # do the reverse of the gyro num
-#             # Case 4: go backwards
-#             if g_num == 4:
-#                 IN1.high()
-#                 IN2.low()
-#                 IN3.low()
-#                 IN4.high()
-#             # Case 3: go forwards
-#             elif g_num == 3:
-#                 IN1.low()
-#                 IN2.high()
-#                 IN3.high()
-#                 IN4.low()
-#             # Case 2: turn right back
-#             elif g_num == 2:
-#                 IN1.high()
-#                 IN2.low()
-#                 IN3.low()
-#                 IN4.low()
-#             # Case 1: turn left back
-#             elif g_num == 1:
-#                 IN1.low()
-#                 IN2.low()
-#                 IN3.low()
-#                 IN4.high()
-#                 
-#             utime.sleep_ms(delay_ms*17)
-#             
-#     # stop the car once complete and reset queues
-#     IN1.low()
-#     IN2.low()
-#     IN3.low()
-#     IN4.low()
-#     IN5.low()
-#     IN6.low()
-#     IN7.low()
-#     IN8.low()
-#     print("Queue length: ", g)
-#     gyro_queue.clear()
-#     #hall_queue.clear()
 
 # Run both tasks
 async def main():
@@ -539,6 +335,8 @@ async def main():
 
 # Start the main event loop
 asyncio.run(main())
+
+
 
 
 

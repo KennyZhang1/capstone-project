@@ -76,24 +76,27 @@ async def get_gyro():
     abs_y_tilt = abs(tilt_y)
     abs_x_tilt = abs(tilt_x)
     
-    if abs_y_tilt < 25:
-        y_power = 0
-    elif abs_y_tilt < 45:
-        y_power = 1
-    elif abs_y_tilt < 65:
-        y_power = 2
-    else:
-        y_power = 3
-
-    if abs_x_tilt < 15:
-        x_power = 0
-    elif abs_x_tilt < 40:
-        x_power = 1
-    elif abs_x_tilt < 70:
-        x_power = 2
-    else:
-        x_power = 3
-        
+    y_power = abs_y_tilt
+    x_power = abs_x_tilt
+    
+#     if abs_y_tilt < 25:
+#         y_power = 0
+#     elif abs_y_tilt < 45:
+#         y_power = 1
+#     elif abs_y_tilt < 65:
+#         y_power = 2
+#     else:
+#         y_power = 3
+# 
+#     if abs_x_tilt < 15:
+#         x_power = 0
+#     elif abs_x_tilt < 40:
+#         x_power = 1
+#     elif abs_x_tilt < 70:
+#         x_power = 2
+#     else:
+#         x_power = 3
+#         
     if tilt_y >= 0:
         y_dir = 1
     else:
@@ -103,7 +106,7 @@ async def get_gyro():
         x_dir = 1
     else:
         x_dir = -1
-    
+     
     
     return y_power, x_power, y_dir, x_dir
 

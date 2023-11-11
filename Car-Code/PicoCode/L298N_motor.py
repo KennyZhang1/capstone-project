@@ -28,6 +28,7 @@ import time
 from machine import PWM, Pin
 
 class L298N:
+
     def __init__(self, ENA, IN1, IN2):        
         self.IN1 = Pin(IN1, Pin.OUT)
         self.IN2 = Pin(IN2, Pin.OUT)
@@ -36,6 +37,10 @@ class L298N:
         self.ismoving = False
         self.direction = 'STOP'
         self.time = 0
+        
+        self.FREQUENCY = 50
+        self.MIN_DUTY_CYCLE = 10000
+        self.MAX_DUTY_CYCLE = 65535
          
     def forward(self):
         self.IN1.value(1)
@@ -56,9 +61,25 @@ class L298N:
         self.Direction = 'STOP'
         
     def setSpeed(self, speed):
-        self.pwm.freq(150)
+        self.pwm.freq(self.FREQUENCY)
         self.speed = speed
         self.pwm.duty_u16(speed)
+        
+    def setSpeedPercAndDir(self, perc):
+        self.pwm.freq(self.FREQUENCY)
+        
+        if perc==0:
+            power = 0
+        else:
+            power = int(((self.MAX_DUTY_CYCLE - self.MIN_DUTY_CYCLE)*abs(perc)) + self.MIN_DUTY_CYCLE)
+        
+        if perc > 0:
+            self.forward()
+        else: 
+            self.backward()
+            
+        self.speed = power
+        self.pwm.duty_u16(power)
         
     def getSpeed(self):
         return self.speed
@@ -113,6 +134,8 @@ class L298N:
             print('False')
         else:
             pass
+
+
 
 
 
