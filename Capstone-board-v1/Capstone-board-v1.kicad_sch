@@ -2133,14 +2133,14 @@
     (property "Value" "Battery" (at 44.45 52.7685 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "Connector_Hirose:Hirose_DF11-4DP-2DSA_2x02_P2.00mm_Vertical" (at 40.64 50.546 90)
+    (property "Footprint" "Connector_Hirose:Hirose_DF11-6DP-2DSA_2x03_P2.00mm_Vertical" (at 40.64 50.546 90)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (at 40.64 50.546 90)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid a5607e9f-c4a0-4c5a-a78d-de7ca8e6fa8b))
-    (pin "2" (uuid af3ca34e-7c5f-44ca-9d57-64255fcd6025))
+    (pin "1" (uuid 107173ec-7273-43cf-b09f-2e2f680cba0e))
+    (pin "2" (uuid ecd807aa-d50d-42bf-b4ff-90c46a8fadce))
     (instances
       (project "Capstone-board-v1"
         (path "/5a0b0107-0183-4094-a3d7-2a417dfae25a"
@@ -2713,7 +2713,7 @@
     (property "Value" "DC Vibration Motor" (at 138.43 114.3 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "Connector_Hirose:Hirose_DF13-02P-1.25DSA_1x02_P1.25mm_Vertical" (at 133.35 114.046 0)
+    (property "Footprint" "Connector_PinSocket_2.54mm:PinSocket_1x02_P2.54mm_Vertical" (at 133.35 114.046 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (at 133.35 114.046 0)
@@ -2739,16 +2739,16 @@
     (property "Value" "Hall Effect Sensor" (at 57.15 158.75 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
-    (property "Footprint" "Connector_Hirose:Hirose_DF13-03P-1.25DSA_1x03_P1.25mm_Vertical" (at 72.39 160.02 0)
+    (property "Footprint" "Connector_PinSocket_2.54mm:PinSocket_1x03_P2.54mm_Vertical" (at 72.39 160.02 0)
       (effects (font (size 1.27 1.27) italic) (justify left) hide)
     )
     (property "Datasheet" "http://www.allegromicro.com/~/media/Files/Datasheets/A1363-Datasheet.ashx?la=en" (at 63.5 157.48 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 40f8d015-0750-425a-b7ac-06be24a34eb2))
-    (pin "2" (uuid ae621e4f-d45e-4e16-90a8-99be757b34fe))
-    (pin "3" (uuid 41206cd6-6fc0-4149-8e00-9304488ed32d))
-    (pin "3" (uuid 41206cd6-6fc0-4149-8e00-9304488ed32d))
+    (pin "1" (uuid d8373c56-2a40-46b8-be20-6726bda212c4))
+    (pin "2" (uuid fe301071-17bd-41b0-8dd3-2c85855ccba1))
+    (pin "3" (uuid ff9871cb-1674-45db-b47f-4d329afa6a39))
+    (pin "3" (uuid ff9871cb-1674-45db-b47f-4d329afa6a39))
     (instances
       (project "Capstone-board-v1"
         (path "/5a0b0107-0183-4094-a3d7-2a417dfae25a"
