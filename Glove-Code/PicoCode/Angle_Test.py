@@ -77,16 +77,16 @@ while True:
 #     print("Diff X: {:.2f} ||| Diff Y: {:.2f} ||| Diff Z: {:.2f},".format(diff_X, diff_Y, diff_Z), end="\r")
     
     output1=""
-    if tilt_x1 < -30:
+    if tilt_x1 < -50:
         output1+="Go Forward X: {:.2f},".format(tilt_x1)
-    elif tilt_x1 > 30:
+    elif tilt_x1 > 60:
         output1+="Go Backward X: {:.2f},".format(tilt_x1)
     else:
         output1+="Stay X: {:.2f},".format(tilt_x1)
         
-    if tilt_y1 < -15:
+    if tilt_y1 < -50:
         output1+=" Turn Right Y: {:.2f},".format(tilt_y1)
-    elif tilt_y1 > 15:
+    elif tilt_y1 > 60:
         output1+=" Turn Left Y: {:.2f},".format(tilt_y1)
     else:
         output1+=" Stay Y: {:.2f},".format(tilt_y1)

@@ -12,8 +12,8 @@ IN4 = Pin(4, Pin.OUT)
 ENB = PWM(Pin(5))
 ENA.freq(150)
 ENB.freq(150)
-ENA.duty_u16(10000)
-ENB.duty_u16(10000)
+ENA.duty_u16(30000)
+ENB.duty_u16(30000)
 
 while True:
     IN1.low()
