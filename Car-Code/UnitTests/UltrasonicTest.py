@@ -24,5 +24,5 @@ def ultra():
    
 while True:
    ultra()
-   #print("The distance from object is cm")
+   print("The distance from object is cm")
    utime.sleep(1)

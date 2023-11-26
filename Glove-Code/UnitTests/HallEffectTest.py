@@ -3,8 +3,7 @@ from machine import Pin
 
 p25 = Pin('LED',Pin.OUT)
 
-test_point = Pin(14,Pin.IN)
-on_point = Pin(1, Pin.OUT)
+test_point = Pin(15,Pin.IN)
 
 
 

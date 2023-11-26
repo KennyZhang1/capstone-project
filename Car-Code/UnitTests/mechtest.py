@@ -36,13 +36,16 @@ back_left = L298N(BACK_LEFT_EN, BACK_LEFT_IN1, BACK_LEFT_IN2)
 front_right = L298N(FRONT_RIGHT_EN, FRONT_RIGHT_IN1, FRONT_RIGHT_IN2)
 front_left = L298N(FRONT_LEFT_EN, FRONT_LEFT_IN1, FRONT_LEFT_IN2)
 
-back_right.forward()
+
 
 speedPerc = 0.0
 while True:
    
-    back_right.setSpeedPerc(speedPerc)
-    print("Current Percentage: ", speedPerc, "Current DC: ", back_right.getSpeed())
+    front_left.setSpeedPercAndDir(speedPerc)
+    front_right.setSpeedPercAndDir(speedPerc)
+    back_right.setSpeedPercAndDir(speedPerc)
+    back_right.setSpeedPercAndDir(speedPerc)
+    print("Current Percentage: ", speedPerc, "Current DC: ", speedPerc)
     
     time.sleep(2)
     

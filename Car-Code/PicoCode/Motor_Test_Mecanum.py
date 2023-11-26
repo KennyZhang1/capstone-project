@@ -35,6 +35,11 @@ ENB.freq(150)
 ENC.freq(150)
 END.freq(150)
 
+ENA.duty_u16(30000)
+ENB.duty_u16(30000)
+ENC.duty_u16(30000)
+END.duty_u16(30000)
+
 
 while True:
     IN1.high()
